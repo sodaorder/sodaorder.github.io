@@ -1,261 +1,443 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>배송지 입력</title>
-  <!-- Daum 우편번호 서비스 -->
-  <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: #f4f6f8; color: #333; padding: 16px; display: flex; justify-content: center; }
-    .container { width: 100%; max-width: 480px; background: #ffffff; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-    h2 { font-size: 20px; font-weight: 700; margin-bottom: 20px; text-align: center; color: #111; }
-    .card { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 16px; margin-bottom: 20px; }
-    .card-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; }
-    .card-row:last-child { margin-bottom: 0; }
-    .label { color: #666; }
-    .value { font-weight: 600; color: #222; }
-    .form-group { margin-bottom: 16px; }
-    label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #444; }
-    input { width: 100%; height: 44px; padding: 0 12px; border: 1px solid #ced4da; border-radius: 6px; font-size: 14px; outline: none; }
-    input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
-    .input-btn-group { display: flex; gap: 8px; }
-    .btn-secondary { background: #4b5563; color: #fff; border: none; padding: 0 16px; border-radius: 6px; font-size: 13px; cursor: pointer; white-space: nowrap; }
-    .btn-submit { width: 100%; height: 50px; background: #2563eb; color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 10px; }
-    .btn-submit:disabled { background: #93c5fd; cursor: not-allowed; }
-    .error-box { background: #fee2e2; color: #dc2626; padding: 12px; border-radius: 6px; font-size: 14px; text-align: center; margin-bottom: 16px; display: none; }
-    .bank-info { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px; margin-top: 16px; font-size: 13px; }
-    .loading { text-align: center; padding: 40px 0; font-size: 15px; color: #666; }
-  </style>
+ <base target="_top">
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+ <title>배송지 정보 입력</title>
+ <!-- Kakao 우편번호 서비스 -->
+ <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+ <style>
+ * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+ body { background-color: #f4f6f9; margin: 0; padding: 15px; color: #333; }
+ .container { max-width: 480px; margin: 0 auto; background: #fff; padding: 24px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+ 
+ .header { text-align: center; padding-bottom: 18px; border-bottom: 2px solid #f0f0f0; margin-bottom: 20px; }
+ .header h2 { margin: 0; font-size: 20px; color: #1a1a1a; }
+ .header p { margin: 6px 0 0; font-size: 13px; color: #666; }
+
+ .summary-card { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 12px; padding: 14px 16px; margin-bottom: 20px; }
+ .summary-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 6px; }
+ .summary-row:last-child { margin-bottom: 0; }
+ .summary-label { color: #6c757d; }
+ .summary-val { font-weight: 600; color: #212529; }
+
+ .bank-card { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 14px 16px; margin-bottom: 20px; }
+ .bank-title { font-size: 13px; font-weight: bold; color: #1e40af; margin-bottom: 8px; }
+ .bank-row { display: flex; justify-content: space-between; align-items: center; font-size: 13.5px; margin-bottom: 4px; }
+ .bank-row:last-child { margin-bottom: 0; }
+ .bank-label { color: #3b82f6; }
+ .bank-val { font-weight: bold; color: #1e3a8a; }
+ .btn-copy { background: #2563eb; color: #fff; border: none; border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: 600; cursor: pointer; margin-left: 8px; }
+
+ .form-group { margin-bottom: 16px; }
+ label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #495057; }
+ input[type="text"], input[type="tel"], select, textarea {
+   width: 100%; padding: 12px 14px; font-size: 15px; border: 1px solid #ced4da; border-radius: 8px; outline: none; transition: border 0.2s;
+ }
+ input:focus, textarea:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+ input[readonly] { background-color: #f1f3f5; cursor: not-allowed; }
+
+ .postcode-box { display: flex; gap: 8px; }
+ .btn-search { width: 110px; background: #4b5563; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
+ 
+ /* 동의 체크박스 스타일 */
+ .agree-container { background: #fafafa; border: 1px solid #eee; border-radius: 12px; padding: 14px; margin-top: 20px; margin-bottom: 16px; }
+ .agree-item { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; margin-bottom: 12px; }
+ .agree-item:last-child { margin-bottom: 0; }
+ .agree-item input[type="checkbox"] { width: 18px; height: 18px; margin-top: 2px; flex-shrink: 0; accent-color: #2563eb; cursor: pointer; }
+ .agree-text { font-size: 12.5px; color: #4b5563; line-height: 1.45; word-break: keep-all; }
+ .agree-tag { color: #ef4444; font-weight: bold; margin-right: 2px; }
+
+ .btn-submit {
+   width: 100%; padding: 15px; background: #2563eb; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 6px;
+ }
+ .btn-submit:disabled { background: #93c5fd; cursor: not-allowed; }
+
+ .security-footer { text-align: center; margin-top: 24px; font-size: 11px; color: #9ca3af; line-height: 1.5; border-top: 1px solid #f3f4f6; padding-top: 16px; }
+
+ .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1000; justify-content: center; align-items: center; }
+ .modal-box { background: #fff; width: 85%; max-width: 340px; padding: 22px; border-radius: 16px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
+ .modal-text { font-size: 15px; color: #1f2937; margin-bottom: 18px; line-height: 1.4; word-break: keep-all; }
+ .modal-btn { width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; }
+
+ .loading-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.85); z-index: 999; justify-content: center; align-items: center; flex-direction: column; }
+ .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #2563eb; border-radius: 50%; animation: spin 1s linear infinite; }
+ @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+ .error-box { display: none; background: #fee2e2; border: 1px solid #f87171; color: #991b1b; padding: 16px; border-radius: 12px; text-align: center; font-size: 14px; }
+ .success-box { display: none; text-align: center; padding: 30px 10px; }
+ .success-icon { font-size: 48px; margin-bottom: 12px; }
+ </style>
 </head>
 <body>
 
+<!-- 커스텀 모달 알림창 -->
+<div class="modal-overlay" id="customModal">
+ <div class="modal-box">
+   <div id="modalText" class="modal-text"></div>
+   <button class="modal-btn" onclick="closeModal()">확인</button>
+ </div>
+</div>
+
+<!-- 로딩 오버레이 -->
+<div class="loading-overlay" id="loading">
+ <div class="spinner"></div>
+ <p id="loadingText" style="margin-top:12px; font-weight:600; color:#374151;">주문 정보를 확인 중입니다...</p>
+</div>
+
 <div class="container">
-  <div id="loading" class="loading">주문 정보를 안전하게 불러오는 중입니다...</div>
-  <div id="error-box" class="error-box"></div>
 
-  <div id="main-content" style="display: none;">
-    <h2 id="page-title">배송지 입력</h2>
+ <!-- 에러 박스 -->
+ <div class="error-box" id="errorBox"></div>
 
-    <!-- 주문 정보 요약 -->
-    <div class="card">
-      <div class="card-row"><span class="label">채널명</span><span class="value" id="disp-channel">-</span></div>
-      <div class="card-row"><span class="label">닉네임</span><span class="value" id="disp-nickname">-</span></div>
-      <div class="card-row"><span class="label">주문금액</span><span class="value" id="disp-amount">-</span></div>
-      <div class="card-row"><span class="label">수량</span><span class="value" id="disp-qty">-</span></div>
-      <div class="card-row"><span class="label">합배여부</span><span class="value" id="disp-combined">-</span></div>
-    </div>
+ <div id="mainContent" style="display: none;">
+   <!-- Header -->
+   <div class="header">
+     <h2>배송지 정보 입력</h2>
+     <p>주문자 정보 확인 후 배송지를 입력해 주세요.</p>
+   </div>
 
-    <!-- 입금 정보 -->
-    <div class="bank-info">
-      <div class="card-row"><span class="label">입금 계좌</span><span class="value" id="disp-account">-</span></div>
-      <div class="card-row"><span class="label">예금주</span><span class="value" id="disp-bankowner">-</span></div>
-    </div>
-    
-    <div style="height: 20px;"></div>
+   <!-- 요약 정보 카드 (4개) -->
+   <div class="summary-card">
+     <div class="summary-row"><span class="summary-label">판매채널</span><span class="summary-val" id="dispChannel">-</span></div>
+     <div class="summary-row"><span class="summary-label">닉네임</span><span class="summary-val" id="dispNickname">-</span></div>
+     <div class="summary-row"><span class="summary-label">주문수량</span><span class="summary-val" id="dispQty">-</span></div>
+     <div class="summary-row"><span class="summary-label">주문금액</span><span class="summary-val" id="dispAmount">-</span></div>
+   </div>
 
-    <form id="shipping-form">
-      <div class="form-group">
-        <label for="depositorName">입금자명</label>
-        <input type="text" id="depositorName" placeholder="입금자 성함을 입력하세요" required>
-      </div>
+   <!-- Step 1: 본인 인증 화면 -->
+   <div id="stepAuth">
+     <div class="form-group">
+       <label for="authCode">본인 인증번호 (휴대폰 번호 뒤 4자리)</label>
+       <input type="tel" id="authCode" placeholder="숫자 4자리 입력" maxlength="4" autocomplete="off" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+     </div>
+     <button class="btn-submit" onclick="submitAuth()">인증 확인</button>
+   </div>
 
-      <div class="form-group">
-        <label for="authNo">휴대폰 번호 뒤 4자리 (본인 인증 및 주소 자동 조회)</label>
-        <div class="input-btn-group">
-          <input type="tel" id="authNo" maxlength="4" placeholder="1234" required>
-          <button type="button" class="btn-secondary" id="btn-verify">주소 불러오기</button>
-        </div>
-      </div>
+   <!-- Step 2: 배송지 입력 폼 -->
+   <div id="stepForm" style="display: none;">
+     <form id="shippingForm" onsubmit="event.preventDefault(); submitForm();">
+       
+       <!-- 입금자명 -->
+       <div class="form-group">
+         <label>입금자명 <span style="font-weight:normal; font-size:12px; color:#ef4444;">(닉네임으로 입금해주셔야 빠르게 확인할 수 있어요!)</span></label>
+         <input type="text" id="depositorName" required placeholder="입금자명 입력">
+       </div>
 
-      <div class="form-group">
-        <label for="receiverName">수령인 성함</label>
-        <input type="text" id="receiverName" placeholder="받으실 분 성함" required>
-      </div>
+       <!-- 해당 채널 전용 입금 계좌 안내 카드 -->
+       <div class="bank-card">
+         <div class="bank-title">💳 입금 계좌 안내</div>
+         <div class="bank-row"><span class="bank-label">예금주</span><span class="bank-val" id="dispBankOwner">-</span></div>
+         <div class="bank-row">
+           <span class="bank-label">계좌번호</span>
+           <span class="bank-val" id="dispAccountNo">-</span>
+           <button type="button" class="btn-copy" onclick="copyAccountNo()">복사</button>
+         </div>
+       </div>
 
-      <div class="form-group">
-        <label for="phone">수령인 연락처</label>
-        <input type="tel" id="phone" placeholder="010-0000-0000" required>
-      </div>
+       <div class="form-group">
+         <label>수령인 성함 <span style="color:red;">*</span></label>
+         <input type="text" id="receiverName" required placeholder="수령인 성함 입력">
+       </div>
 
-      <div class="form-group">
-        <label for="postcode">우편번호</label>
-        <div class="input-btn-group">
-          <input type="text" id="postcode" readonly required>
-          <button type="button" class="btn-secondary" id="btn-search-addr">주소 검색</button>
-        </div>
-      </div>
+       <div class="form-group">
+         <label>연락처 <span style="color:red;">*</span></label>
+         <input type="tel" id="phone" required placeholder="010-0000-0000" maxlength="13" oninput="autoHyphen(this)">
+       </div>
 
-      <div class="form-group">
-        <label for="addressBase">기본 주소</label>
-        <input type="text" id="addressBase" readonly required>
-      </div>
+       <div class="form-group">
+         <label>우편번호 <span style="color:red;">*</span></label>
+         <div class="postcode-box">
+           <input type="text" id="postcode" required readonly placeholder="우편번호">
+           <button type="button" class="btn-search" onclick="execDaumPostcode()">주소 검색</button>
+         </div>
+       </div>
 
-      <div class="form-group">
-        <label for="addressDetail">상세 주소</label>
-        <input type="text" id="addressDetail" placeholder="동, 호수 등 상세 주소 입력" required>
-      </div>
+       <div class="form-group">
+         <label>기본 주소 <span style="color:red;">*</span></label>
+         <input type="text" id="addressBase" required readonly placeholder="우편번호 검색 시 자동 입력">
+       </div>
 
-      <div class="form-group">
-        <label for="memo">배송 요청사항 (선택)</label>
-        <input type="text" id="memo" placeholder="예: 문 앞에 놓아주세요">
-      </div>
+       <div class="form-group">
+         <label>상세 주소 <span style="color:red;">*</span></label>
+         <input type="text" id="addressDetail" required placeholder="동, 호수 등 상세주소 입력">
+       </div>
 
-      <button type="submit" class="btn-submit" id="btn-submit">배송지 제출 완료</button>
-    </form>
-  </div>
+       <!-- 배송 요청사항 -->
+       <div class="form-group">
+         <label>배송 요청사항 <span style="font-weight:normal; font-size:12px; color:#6b7280;">(택배사에 전달하는 내용입니다. 상품 관련 요청은 채널로 문의 주세요.)</span></label>
+         <input type="text" id="memo" placeholder="예: 문 앞에 놓아주세요">
+       </div>
+
+       <!-- 필수 동의 체크박스 2종 -->
+       <div class="agree-container">
+         <label class="agree-item">
+           <input type="checkbox" id="chkPolicy">
+           <span class="agree-text">
+             <span class="agree-tag">[필수]</span> 모든 상품은 검수 후 출고되나 미세 오염이나 미세 흠집이 있을 수 있으며, 상품 접수 후 교환 및 환불은 채널 운영 정책에 따라 진행됨에 동의합니다.
+           </span>
+         </label>
+         <label class="agree-item">
+           <input type="checkbox" id="chkPrivacy">
+           <span class="agree-text">
+             <span class="agree-tag">[필수]</span> 개인정보 수집 및 이용 동의 (원활한 상품 배송 및 정산 확인을 위해 수령인 정보, 연락처, 주소를 수집합니다.)
+           </span>
+         </label>
+       </div>
+
+       <button type="submit" class="btn-submit" id="btnSubmit">배송지 저장 완료</button>
+     </form>
+   </div>
+
+   <!-- Step 3: 제출 완료 화면 -->
+   <div class="success-box" id="stepSuccess">
+     <div class="success-icon">🎉</div>
+     <h3 style="margin:0 0 8px; font-size:20px;">제출이 완료되었습니다!</h3>
+     <p style="color:#6b7280; font-size:14px; margin:0;">소중한 상품을 안전하게 배송해 드리겠습니다.</p>
+   </div>
+
+   <div class="security-footer">
+     🔒 고객님의 소중한 개인정보는 Google Workspace 보안 정책 및 SSL 256bit 암호화를 통해 안전하게 보호됩니다.
+   </div>
+ </div>
+
 </div>
 
 <script>
-  // 📌 구글 앱스 스크립트 API URL
-  const API_URL = "https://script.google.com/macros/s/AKfycbwyBjx5Ex5_Fow5PmLG62C0noMYMFEbI2h8_o3abmKRTwYog2BVJU6JX9g2NYI2sPsTrg/exec";
-  
-  let currentToken = "";
-  let orderDataInfo = null;
+ // 📌 백엔드 GAS API URL (테스트용/본서버용 지정)
+ const API_URL = "https://script.google.com/macros/s/AKfycbwyBjx5Ex5_Fow5PmLG62C0noMYMFEbI2h8_o3abmKRTwYog2BVJU6JX9g2NYI2sPsTrg/exec";
 
-  // 구글 순간 부하 대비 자동 재요청 Wrapper (최대 3회)
-  async function fetchWithRetry(url, options = {}, retries = 3, delay = 1000) {
-    for (let i = 0; i < retries; i++) {
-      try {
-        const response = await fetch(url, options);
-        if (!response.ok) throw new Error("HTTP error " + response.status);
-        return await response.json();
-      } catch (err) {
-        if (i === retries - 1) throw err;
-        await new Promise(res => setTimeout(res, delay));
-      }
-    }
-  }
+ let token = "";
+ let nickname = "";
+ let bankAccountNo = "";
+ let verifiedAuthNo = "";
 
-  window.addEventListener("DOMContentLoaded", async () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    currentToken = urlParams.get("t");
+ // 네트워크 순간 장애 대비 재요청 Wrapper (최대 3회)
+ async function fetchWithRetry(url, options = {}, retries = 3, delay = 1000) {
+   for (let i = 0; i < retries; i++) {
+     try {
+       const response = await fetch(url, options);
+       if (!response.ok) throw new Error("HTTP error " + response.status);
+       return await response.json();
+     } catch (err) {
+       if (i === retries - 1) throw err;
+       await new Promise(res => setTimeout(res, delay));
+     }
+   }
+ }
 
-    if (!currentToken) {
-      showError("유효하지 않은 접근입니다. (토큰 누락)");
-      return;
-    }
+ function showAlert(msg) {
+   document.getElementById('modalText').innerText = msg;
+   document.getElementById('customModal').style.display = 'flex';
+ }
 
-    try {
-      const res = await fetchWithRetry(`${API_URL}?action=GET_ORDER_DATA&t=${encodeURIComponent(currentToken)}`);
-      
-      if (!res.success) {
-        showError(res.message || "주문 내역을 찾을 수 없습니다.");
-        return;
-      }
+ function closeModal() {
+   document.getElementById('customModal').style.display = 'none';
+ }
 
-      orderDataInfo = res.order;
-      renderOrderData(res.order, res.bankInfo);
-    } catch (err) {
-      showError("서버와의 통신이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.");
-    }
-  });
+ function showLoading(text) {
+   document.getElementById('loadingText').innerText = text;
+   document.getElementById('loading').style.display = 'flex';
+ }
 
-  function renderOrderData(order, bankInfo) {
-    document.getElementById("loading").style.display = "none";
-    document.getElementById("main-content").style.display = "block";
-    document.title = `${order.nickname}님 배송지 입력`;
-    document.getElementById("page-title").innerText = `${order.nickname}님 배송지 입력`;
+ function hideLoading() {
+   document.getElementById('loading').style.display = 'none';
+ }
 
-    document.getElementById("disp-channel").innerText = order.channelName || "-";
-    document.getElementById("disp-nickname").innerText = order.nickname || "-";
-    document.getElementById("disp-amount").innerText = (order.amount || 0).toLocaleString() + "원";
-    document.getElementById("disp-qty").innerText = (order.quantity || 0) + "개";
-    document.getElementById("disp-combined").innerText = order.combined || "단배";
+ function copyAccountNo() {
+   if (!bankAccountNo || bankAccountNo === "-") {
+     showAlert("등록된 계좌 정보가 없습니다.");
+     return;
+   }
+   
+   const onlyDigits = bankAccountNo.replace(/[^0-9]/g, '');
+   if (!onlyDigits) {
+     showAlert("유효한 계좌번호가 없습니다.");
+     return;
+   }
 
-    document.getElementById("disp-account").innerText = bankInfo.accountNo || "-";
-    document.getElementById("disp-bankowner").innerText = bankInfo.bankOwner || "-";
-  }
+   if (navigator.clipboard && navigator.clipboard.writeText) {
+     navigator.clipboard.writeText(onlyDigits).then(() => showAlert("계좌번호(숫자)가 복사되었습니다."));
+   } else {
+     const temp = document.createElement("textarea");
+     temp.value = onlyDigits;
+     document.body.appendChild(temp);
+     temp.select();
+     document.execCommand("copy");
+     document.body.removeChild(temp);
+     showAlert("계좌번호(숫자)가 복사되었습니다.");
+   }
+ }
 
-  function showError(msg) {
-    document.getElementById("loading").style.display = "none";
-    const errBox = document.getElementById("error-box");
-    errBox.innerText = msg;
-    errBox.style.display = "block";
-  }
+ // 페이지 초기화: URL 파라미터에서 토큰 추출 후 주문데이터 수신
+ window.addEventListener("DOMContentLoaded", async () => {
+   const urlParams = new URLSearchParams(window.location.search);
+   token = urlParams.get("t");
 
-  // 본인 인증 및 배송지 자동 불러오기
-  document.getElementById("btn-verify").addEventListener("click", async () => {
-    const authNo = document.getElementById("authNo").value.trim();
-    if (!authNo || authNo.length !== 4) {
-      alert("휴대폰 번호 뒤 4자리를 정확히 입력해 주세요.");
-      return;
-    }
+   if (!token) {
+     showError("유효하지 않은 접근입니다. (토큰 누락)");
+     return;
+   }
 
-    try {
-      const res = await fetchWithRetry(`${API_URL}?action=VERIFY_AUTH&t=${encodeURIComponent(currentToken)}&authCode=${encodeURIComponent(authNo)}`);
-      if (res.success && res.address) {
-        document.getElementById("receiverName").value = res.address.receiverName || "";
-        document.getElementById("phone").value = res.address.phone || "";
-        document.getElementById("postcode").value = res.address.postcode || "";
-        document.getElementById("addressBase").value = res.address.addressBase || "";
-        document.getElementById("addressDetail").value = res.address.addressDetail || "";
-        document.getElementById("memo").value = res.address.memo || "";
-        if (res.address.depositorName) {
-          document.getElementById("depositorName").value = res.address.depositorName;
-        }
-        alert("이전 배송지 정보를 성공적으로 불러왔습니다.");
-      } else {
-        alert("일치하는 이전 배송지 내역이 없습니다. 새롭게 작성해 주세요.");
-      }
-    } catch (err) {
-      alert("주소 조회 중 오류가 발생했습니다.");
-    }
-  });
+   showLoading("주문 정보를 불러오는 중입니다...");
 
-  // 카카오 우편번호 검색
-  document.getElementById("btn-search-addr").addEventListener("click", () => {
-    new daum.Postcode({
-      oncomplete: function(data) {
-        document.getElementById("postcode").value = data.zonecode;
-        document.getElementById("addressBase").value = data.roadAddress || data.jibunAddress;
-        document.getElementById("addressDetail").focus();
-      }
-    }).open();
-  });
+   try {
+     const res = await fetchWithRetry(`${API_URL}?action=GET_ORDER_DATA&t=${encodeURIComponent(token)}`);
+     hideLoading();
 
-  // 최종 제출
-  document.getElementById("shipping-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const btnSubmit = document.getElementById("btn-submit");
-    btnSubmit.disabled = true;
-    btnSubmit.innerText = "저장 중...";
+     if (!res.success) {
+       showError(res.message || "주문 내역을 찾을 수 없습니다.");
+       return;
+     }
 
-    const payload = {
-      action: "SAVE_SHIPPING",
-      token: currentToken,
-      nickname: orderDataInfo.nickname,
-      depositorName: document.getElementById("depositorName").value.trim(),
-      authNo: document.getElementById("authNo").value.trim(),
-      receiverName: document.getElementById("receiverName").value.trim(),
-      phone: document.getElementById("phone").value.trim(),
-      postcode: document.getElementById("postcode").value.trim(),
-      addressBase: document.getElementById("addressBase").value.trim(),
-      addressDetail: document.getElementById("addressDetail").value.trim(),
-      memo: document.getElementById("memo").value.trim()
-    };
+     // 주문 정보 및 계좌 바인딩
+     const order = res.order;
+     const bankInfo = res.bankInfo;
 
-    try {
-      const res = await fetchWithRetry(API_URL, {
-        method: "POST",
-        body: JSON.stringify(payload)
-      });
+     nickname = order.nickname;
+     bankAccountNo = bankInfo.accountNo || "-";
 
-      if (res.success) {
-        alert("배송지 입력이 성공적으로 완료되었습니다!");
-        window.location.reload();
-      } else {
-        alert("저장 실패: " + res.message);
-        btnSubmit.disabled = false;
-        btnSubmit.innerText = "배송지 제출 완료";
-      }
-    } catch (err) {
-      alert("제출 중 오류가 발생했습니다. 다시 시도해 주세요.");
-      btnSubmit.disabled = false;
-      btnSubmit.innerText = "배송지 제출 완료";
-    }
-  });
+     document.getElementById("dispChannel").innerText = order.channelName || "-";
+     document.getElementById("dispNickname").innerText = (order.nickname || "-") + " 님";
+     document.getElementById("dispQty").innerText = (order.quantity || 0) + " 개";
+     document.getElementById("dispAmount").innerText = Number(order.amount || 0).toLocaleString() + " 원";
+
+     document.getElementById("depositorName").value = order.nickname || "";
+     document.getElementById("dispBankOwner").innerText = bankInfo.bankOwner || "-";
+     document.getElementById("dispAccountNo").innerText = bankInfo.accountNo || "-";
+
+     document.getElementById("mainContent").style.display = "block";
+   } catch (err) {
+     hideLoading();
+     showError("서버와의 통신이 원활하지 않습니다. 잠시 후 다시 접속해 주세요.");
+   }
+ });
+
+ function showError(msg) {
+   hideLoading();
+   const errBox = document.getElementById("errorBox");
+   errBox.innerText = msg;
+   errBox.style.display = "block";
+ }
+
+ // Step 1: 본인 인증 확인
+ async function submitAuth() {
+   const authInput = document.getElementById('authCode').value.trim();
+   
+   if (authInput !== "025" && !/^\d{4}$/.test(authInput)) {
+     showAlert("올바른 인증번호(휴대폰 뒤 4자리)를 입력해 주세요.");
+     return;
+   }
+
+   showLoading("배송지 정보 조회 중...");
+   verifiedAuthNo = authInput;
+
+   try {
+     const res = await fetchWithRetry(`${API_URL}?action=VERIFY_AUTH&t=${encodeURIComponent(token)}&authCode=${encodeURIComponent(authInput)}`);
+     hideLoading();
+
+     if (!res.success) {
+       showAlert(res.message || "조회에 실패했습니다.");
+       return;
+     }
+
+     document.getElementById('stepAuth').style.display = 'none';
+     document.getElementById('stepForm').style.display = 'block';
+
+     // 이전 주소 존재 시 자동 채우기
+     if (res.address) {
+       document.getElementById('receiverName').value = res.address.receiverName || '';
+       document.getElementById('phone').value = res.address.phone || '';
+       document.getElementById('postcode').value = res.address.postcode || '';
+       document.getElementById('addressBase').value = res.address.addressBase || '';
+       document.getElementById('addressDetail').value = res.address.addressDetail || '';
+       document.getElementById('memo').value = res.address.memo || '';
+       
+       if (res.address.depositorName) {
+         document.getElementById('depositorName').value = res.address.depositorName;
+       }
+     }
+   } catch (err) {
+     hideLoading();
+     showAlert("인증 과정 중 통신 오류가 발생했습니다.");
+   }
+ }
+
+ // 카카오 우편번호 검색
+ function execDaumPostcode() {
+   new daum.Postcode({
+     oncomplete: function(data) {
+       var addr = (data.userSelectedType === 'R') ? data.roadAddress : data.jibunAddress;
+       document.getElementById('postcode').value = data.zonecode;
+       document.getElementById('addressBase').value = addr;
+       document.getElementById('addressDetail').focus();
+     }
+   }).open();
+ }
+
+ // 전화번호 하이픈 자동생성
+ function autoHyphen(target) {
+   target.value = target.value
+     .replace(/[^0-9]/g, '')
+     .replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, `$1-$2-$3`)
+     .replace(/(\-{1,2})$/g, "");
+ }
+
+ // Step 2: 배송지 저장 제출
+ async function submitForm() {
+   const chkPolicy = document.getElementById('chkPolicy').checked;
+   const chkPrivacy = document.getElementById('chkPrivacy').checked;
+
+   if (!chkPolicy || !chkPrivacy) {
+     showAlert("필수 동의 항목 2가지를 모두 체크해 주세요.");
+     return;
+   }
+
+   const formData = {
+     action: "SAVE_SHIPPING",
+     token: token,
+     nickname: nickname,
+     authNo: verifiedAuthNo,
+     depositorName: document.getElementById('depositorName').value.trim(),
+     receiverName: document.getElementById('receiverName').value.trim(),
+     phone: document.getElementById('phone').value.trim(),
+     postcode: document.getElementById('postcode').value.trim(),
+     addressBase: document.getElementById('addressBase').value.trim(),
+     addressDetail: document.getElementById('addressDetail').value.trim(),
+     memo: document.getElementById('memo').value.trim()
+   };
+
+   if (!formData.depositorName || !formData.receiverName || !formData.phone || !formData.postcode || !formData.addressBase || !formData.addressDetail) {
+     showAlert("필수 항목(*)을 모두 입력해 주세요.");
+     return;
+   }
+
+   showLoading("배송 정보를 저장 중입니다...");
+   document.getElementById('btnSubmit').disabled = true;
+
+   try {
+     const res = await fetchWithRetry(API_URL, {
+       method: "POST",
+       body: JSON.stringify(formData)
+     });
+
+     hideLoading();
+
+     if (res.success) {
+       document.getElementById('stepForm').style.display = 'none';
+       document.getElementById('stepSuccess').style.display = 'block';
+     } else {
+       showAlert("오류: " + res.message);
+       document.getElementById('btnSubmit').disabled = false;
+     }
+   } catch (err) {
+     hideLoading();
+     showAlert("제출 중 오류가 발생했습니다. 다시 시도해 주세요.");
+     document.getElementById('btnSubmit').disabled = false;
+   }
+ }
 </script>
+
 </body>
 </html>
