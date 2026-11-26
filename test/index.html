@@ -70,7 +70,6 @@
     .error-box { display: none; background: #fee2e2; border: 1px solid #f87171; color: #991b1b; padding: 16px; border-radius: 12px; text-align: center; font-size: 14px; line-height: 1.5; }
     .success-box { display: none; text-align: center; padding: 26px 10px; }
     .success-icon { font-size: 48px; margin-bottom: 12px; }
-    .success-extra-box { display: none; margin-top: 18px; background: #fffbeb; border: 1px solid #fcd34d; border-radius: 12px; padding: 14px; text-align: left; font-size: 13px; color: #78350f; line-height: 1.5; }
   </style>
 </head>
 <body>
@@ -210,7 +209,6 @@
         <div class="success-icon">🎉</div>
         <h3 style="margin:0 0 8px; font-size:20px;">제출이 완료되었습니다!</h3>
         <p style="color:#6b7280; font-size:14px; margin:0;">소중한 상품을 안전하게 배송해 드리겠습니다.</p>
-        <div class="success-extra-box" id="successExtraBox"></div>
       </div>
 
       <div class="security-footer">
@@ -223,7 +221,7 @@
     // =================================================================
     // Supabase 접속 설정 (테스트 서버 / 본 서버 스위칭)
     // =================================================================
-    // [1] 테스트 서버 (Soda-dev) - 활성
+    // [1] 테스트 서버 (Soda-dev) - 현재 활성
     const SUPABASE_URL = "https://dwiljslbixerwmcrtgke.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_pko30fn1B3IZ0jQ5P6gn0g_55_nVxT2";
 
@@ -308,8 +306,8 @@
           const totalAmount = baseAmount + parsedExtra;
 
           document.getElementById("islandNoticeDesc").innerHTML =
-            `선택하신 우편번호(<strong>${cleanZip}</strong>)는 도서산간 지역으로 추가운임 <strong>${formatNumber(parsedExtra)}원</strong>이 발생합니다.<br>` +
-            `기존 주문금액(${formatNumber(baseAmount)}원)과 합산하여 입금해 주세요.`;
+            `선택하신 지역(<strong>${cleanZip}</strong>)은 추가운임 <strong>${formatNumber(parsedExtra)}원</strong>이 발생합니다.<br>` +
+            `주문금액과 함께 입금해 주세요.`;
           document.getElementById("islandTotalAmount").textContent = `${formatNumber(totalAmount)}원`;
           noticeBox.style.display = "block";
         } else {
@@ -481,17 +479,6 @@
 
         document.getElementById("stepForm").style.display = "none";
         document.getElementById("stepSuccess").style.display = "block";
-
-        // 이번 주문에서 도서산간 추가운임이 청구된 경우 완료 화면에서도 최종 입금액 안내
-        const chargedExtra = Number(res.extraShippingFee) || 0;
-        if (chargedExtra >= 1000) {
-          const totalAmt = Number(res.totalAmount) || (Number(currentOrder.amount) + chargedExtra);
-          const extraBox = document.getElementById("successExtraBox");
-          extraBox.innerHTML =
-            `<strong>🚚 도서산간 추가운임(${formatNumber(chargedExtra)}원) 안내</strong><br>` +
-            `입금 시 기존 주문금액(${formatNumber(currentOrder.amount)}원)에 추가운임을 더한 <strong>총 ${formatNumber(totalAmt)}원</strong>을 입금해 주세요.`;
-          extraBox.style.display = "block";
-        }
       } catch (err) {
         showModal("저장 중 오류가 발생했습니다.<br>" + err.message);
         btn.disabled = false;
